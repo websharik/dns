@@ -272,7 +272,8 @@ const setDomain = (domain, isTimerMounted) => {
     $('.start-input').value = ''
     setCareeteHelperValue('')
 
-    setDomainName(domain, $('#domainName'))
+    setDomainName(normalizeDomain(domain), $('#domainName'))
+    $('#domainPunyName').innerText = isPunycode(domain) ? `(${domain}.ton)` : ''
     setScreen('main')
 
     clearInterval(updateIntervalId)
@@ -309,6 +310,9 @@ const onInput = (e) => {
         let domain = e.target.value.toLowerCase().trim()
         if (domain.endsWith('.ton')) {
             domain = domain.substring(0, domain.length - 4)
+        }
+        if (!validateDomainChars(domain)) {
+            domain = idnaUts46.toAscii(domain)
         }
         const error = validateDomain(domain)
         if (error) {
@@ -556,6 +560,7 @@ const renderSearchHistory = (node) => {
     try {
         const historyMarkup = getHistoryFromStorage().map(
             (historyRecord) => {
+                const normalizedDomain = normalizeDomain(historyRecord)
                 const sanitizedValue = encodeHTML(historyRecord)
 
                 return `<button class="hover__button" data-record="${sanitizedValue}">
@@ -565,7 +570,7 @@ const renderSearchHistory = (node) => {
                         <path d="M12.0273 7.15381V12.3461H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <div class="text--overflow__hidden" data-record="${sanitizedValue}">
-                    	<span>${sanitizedValue}</span>
+                    	<span>${normalizedDomain}</span>
                     </div>
                     <svg data-record="${sanitizedValue}" class="icon history__record remove" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6.00012 18L18.0001 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
