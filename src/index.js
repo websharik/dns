@@ -100,25 +100,21 @@ $('.badge__dns-mobile').addEventListener('click', () => {
 
 // SET DOMAIN
 
+const validateDomainChars = (domain) => {
+    return !!domain.match(/^[0-9A-Za-z-]+$/) // '-' or 0-9 or a-z ;  abcdefghijklmnopqrstuvwxyz-0123456789
+}
+
 const validateDomain = (domain) => {
     if (domain.length < 4 || domain.length > 126) {
         return store.localeDict.error_length
     }
 
-    for (let i = 0; i < domain.length; i++) {
-        if (domain.charAt(i) === '.') {
-            return store.localeDict.subdomains_not_allowed
-        }
-        const char = domain.charCodeAt(i)
-        const isHyphen = char === 45
-        const isValidChar =
-            (isHyphen && i > 0 && i < domain.length - 1) ||
-            (char >= 48 && char <= 57) ||
-            (char >= 97 && char <= 122) // '-' or 0-9 or a-z ;  abcdefghijklmnopqrstuvwxyz-0123456789
+    if (domain.includes('.')) {
+        return store.localeDict.subdomains_not_allowed
+    }
 
-        if (!isValidChar) {
-            return store.localeDict.invalid_chars
-        }
+    if (!validateDomainChars(domain)) {
+        return store.localeDict.invalid_chars
     }
 }
 
